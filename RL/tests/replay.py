@@ -14,7 +14,7 @@ def run(config):
     options.add_argument("--kiosk")
     options.add_argument("--disable-infobars")
     driver = webdriver.Chrome(service=webdriver_service, options=options)
-    file = os.path.join(os.path.dirname(os.getcwd()), "frontend/index.html")
+    file = os.path.dirname(os.getcwd()) + "/frontend/index.html"
     driver.get('file://' + file)
     time.sleep(1)
     driver.find_element(By.ID, 'roadnet-file').send_keys(os.path.join(os.getcwd(), f'configs/{config}/roadnetLog.json'))
@@ -32,4 +32,4 @@ def run(config):
 
 
 if __name__ == '__main__':
-    run('hangzhou')
+    run('hangzhou_1x1_bc-tyc_18041607_1h')

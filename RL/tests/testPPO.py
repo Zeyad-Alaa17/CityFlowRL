@@ -7,7 +7,7 @@ from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
 
 models_dir = "../models/"
-env_kwargs = {'config': "hangzhou", 'steps_per_episode': 100, 'steps_per_action': 30}
+env_kwargs = {'config': "hangzhou_1x1_bc-tyc_18041607_1h", 'steps_per_episode': 100, 'steps_per_action': 30}
 
 
 def train():

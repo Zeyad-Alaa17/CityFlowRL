@@ -4,7 +4,7 @@ import random
 import gym
 import replay
 
-env_kwargs = {'config': "hangzhou", 'steps_per_episode': 100, 'steps_per_action': 30}
+env_kwargs = {'config': "hangzhou_1x1_bc-tyc_18041607_1h", 'steps_per_episode': 100, 'steps_per_action': 30}
 env = gym.make('CityFlowRL-v0', **env_kwargs)
 
 # Check action space
