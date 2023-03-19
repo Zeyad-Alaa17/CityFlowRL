@@ -1,10 +1,11 @@
 # noinspection PyUnresolvedReferences
 import CityFlowRL
-import gym
 import os
+import gym
 from stable_baselines3 import DQN
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
+
 import replay
 
 models_dir = "../models/"
@@ -31,16 +32,17 @@ def test():
     episodes = 1
     for ep in range(episodes):
         obs = env.reset()
+        rewards = []
         done = False
         while not done:
             action = model.predict(obs)
             obs, reward, done, info = env.step(action)
-
+            rewards.append(reward)
+        print("Episode reward: ", sum(rewards))
         print(info)
     env.close()
-    replay.run(env_kwargs['config'])
+    # replay.run(env_kwargs['config'])
 
 
 if __name__ == "__main__":
-    # train()
     test()

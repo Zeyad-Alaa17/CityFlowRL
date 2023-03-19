@@ -25,18 +25,22 @@ def test():
 
     env = DummyVecEnv([lambda: env])
 
-    model = A2C.load("a2c")
-    episodes = 10
+    model = A2C.load(os.path.join(models_dir, "a2c"))
+
+    episodes = 1
     for ep in range(episodes):
         obs = env.reset()
+        rewards = []
         done = False
         while not done:
             action = model.predict(obs)
             obs, reward, done, info = env.step(action)
+            rewards.append(reward)
+        print("Episode reward: ", sum(rewards))
         print(info)
     env.close()
+    # replay.run(env_kwargs['config'])
 
 
 if __name__ == "__main__":
-    train()
-    # test()
+    test()
