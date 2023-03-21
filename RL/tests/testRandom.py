@@ -1,6 +1,6 @@
 # noinspection PyUnresolvedReferences
-import random
 import CityFlowRL
+import random
 import gym
 
 env_kwargs = {'config': "hangzhou_1x1_bc-tyc_18041607_1h", 'steps_per_episode': 100, 'steps_per_action': 30}

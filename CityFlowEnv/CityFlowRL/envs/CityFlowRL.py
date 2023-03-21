@@ -1,6 +1,5 @@
 import json
 from os import path
-
 import cityflow
 import gym
 import numpy as np
@@ -80,7 +79,6 @@ class CityFlowRL(gym.Env):
 
     def step(self, action):
         # assert isinstance(action, int), "Action must be of integer type."
-        assert self.action_space.contains(action), "Invalid action."
         self.previousPhase = action
 
         self.cityflow.set_tl_phase(self.intersection_id, action)
