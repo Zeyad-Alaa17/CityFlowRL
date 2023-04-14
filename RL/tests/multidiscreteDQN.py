@@ -6,6 +6,7 @@ import random
 from collections import deque
 import gym
 import CityFlowRL
+
 from gym.spaces import MultiDiscrete
 
 
@@ -143,7 +144,7 @@ if __name__ == "__main__":
     models_dir = "../models/"
     env_kwargs = {'config': "1x1_config", 'steps_per_episode': 100, 'steps_per_action': 30}
     env = gym.make('CityFlowRL-v0', **env_kwargs)
-
+    env.set_save_replay(False)
     # print(env._get_state())
     # print(type(env._get_state()))
     # print(env.observation_space.sample())
