@@ -125,7 +125,7 @@ if __name__ == "__main__":
     obs = env.observation_space
     action = env.action_space
     model = MultiDiscreteDQN(obs, action)
-    total_episodes = 200
+    total_episodes = 500
     model.create_model()
     # model.load(os.path.join(models_dir, "multi-hang"))
     for episode in range(1, total_episodes + 1):
@@ -142,14 +142,14 @@ if __name__ == "__main__":
             total_reward += reward
 
         model.epsilon = max(model.epsilon_min, model.epsilon * model.epsilon_decay)
-        print(f"Episode {episode + 1}: Total reward = {total_reward}")
+        print(f"Episode {episode + 1}: Total reward = {total_reward}: avg-travel-time = {info}")
 
-    model.save(os.path.join(models_dir, "multi-hang1"))
+    model.save(os.path.join(models_dir, "multi-1.5M"))
     print("model saved")
 
     # Test the DQN for 10 episodes
     env.set_save_replay(True)
-    num_test_episodes = 10
+    num_test_episodes = 5
     for episode in range(num_test_episodes):
         state = env.reset()
         is_done = False
@@ -165,4 +165,4 @@ if __name__ == "__main__":
             total_reward += reward
 
         # Print the total reward earned in the episode
-        print(f"Episode {episode + 1}: Total reward = {total_reward}")
+        print(f"Episode {episode + 1}: Total reward = {total_reward}: avg-travel-time = {info}")
