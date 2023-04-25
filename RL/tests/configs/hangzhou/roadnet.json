@@ -15,10 +15,7 @@
       "trafficLight": {
         "roadLinkIndices": [],
         "lightphases": [
-          {
-            "time": 5,
-            "availableRoadLinks": []
-          },
+
           {
             "time": 30,
             "availableRoadLinks": []
@@ -70,10 +67,7 @@
       "trafficLight": {
         "roadLinkIndices": [],
         "lightphases": [
-          {
-            "time": 5,
-            "availableRoadLinks": []
-          },
+
           {
             "time": 30,
             "availableRoadLinks": []
@@ -1080,10 +1074,7 @@
       "trafficLight": {
         "roadLinkIndices": [],
         "lightphases": [
-          {
-            "time": 5,
-            "availableRoadLinks": []
-          },
+
           {
             "time": 30,
             "availableRoadLinks": []
@@ -1135,10 +1126,7 @@
       "trafficLight": {
         "roadLinkIndices": [],
         "lightphases": [
-          {
-            "time": 5,
-            "availableRoadLinks": []
-          },
+
           {
             "time": 30,
             "availableRoadLinks": []

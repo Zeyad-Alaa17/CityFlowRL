@@ -28,7 +28,7 @@ def run(config):
         el = driver.find_element(By.ID, 'current-step-num').get_attribute('innerText')
         time.sleep(1)
         newEl = driver.find_element(By.ID, 'current-step-num').get_attribute('innerText')
-    driver.close()
+    driver.quit()
 
 
 if __name__ == '__main__':

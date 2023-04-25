@@ -29,7 +29,7 @@ class CityFlowRL(gym.Env):
         # open cityflow roadnet file into dict
         self.roadnetDict = json.load(open(path.join(self.configDict['dir'], self.configDict['roadnetFile'])))
         self.flowDict = json.load(open(path.join(self.configDict['dir'], self.configDict['flowFile'])))
-
+        self.max_speed = self.flowDict[0]['vehicle']['maxSpeed']
         # create dict of controllable intersections and number of light phases
         self.intersections = {}
         for i in range(len(self.roadnetDict['intersections'])):
@@ -70,12 +70,22 @@ class CityFlowRL(gym.Env):
         x = [x[0] for x in self.intersection_info[1]]
         self.start_lane_ids = list(dict.fromkeys(x))
 
-        self.mode = "start_waiting"
+        self.mode = "count_waiting"
+        # self.mode = 'leader_speed'
 
         self.action_space = spaces.Discrete(self.intersection_info[0][0])
 
-        self.observation_space = spaces.MultiDiscrete(
-            [100] * len(self.start_lane_ids))  # spaces.MultiDiscrete([[100,100,5]]*8)
+        if self.mode == 'count_waiting':
+            self.observation_space = spaces.MultiDiscrete(
+                [100] * len(self.start_lane_ids))  # spaces.MultiDiscrete([[100,100,5]]*8)
+        elif self.mode == 'leader_speed':
+            obs_dict = {}
+            for keys in self.start_lane_ids:
+                obs_dict[keys] = {
+                    'count': spaces.Discrete(100),
+                    'speed': spaces.Box(low=0, high=self.max_speed, shape=(1,), dtype=np.float32)
+                }
+            self.observation_space = spaces.Dict(obs_dict)
 
     def step(self, action):
         # assert isinstance(action, int), "Action must be of integer type."
@@ -119,14 +129,29 @@ class CityFlowRL(gym.Env):
         print("Current time: " + str(self.cityflow.get_current_time()))
 
     def _get_observation(self):
-        lane_waiting_vehicles_dict = self.cityflow.get_lane_waiting_vehicle_count()
+        if self.mode == "count_waiting":
+            lane_waiting_vehicles_dict = self.cityflow.get_lane_waiting_vehicle_count()
 
-        observation = np.zeros((len(self.start_lane_ids)))  # none
-
-        if self.mode == "start_waiting":
-            observation = np.zeros((len(self.start_lane_ids)))  # np.array(np.zeros((len(self.start_lane_ids),3)))
+            observation = np.zeros((len(self.start_lane_ids)))
             for i in range(len(self.start_lane_ids)):
                 observation[i] = lane_waiting_vehicles_dict[self.start_lane_ids[i]]
+        elif self.mode == "leader_speed":
+            lane_vehicles = self.cityflow.get_lane_vehicles()
+            lane_waiting_count = self.cityflow.get_lane_waiting_vehicle_count()
+            observation = {}
+            for keys, values in lane_vehicles.items():
+                if keys in self.start_lane_ids:
+
+                    if values:
+                        leader_speed = self.cityflow.get_vehicle_info(values[0])['speed']
+
+                    else:
+                        leader_speed = self.max_speed
+
+                    observation[keys] = {
+                        'count': lane_waiting_count[keys],
+                        'leader_speed': leader_speed
+                    }
 
         return observation
 
@@ -134,10 +159,21 @@ class CityFlowRL(gym.Env):
         lane_waiting_vehicles_dict = self.cityflow.get_lane_waiting_vehicle_count()
         reward = 0.0
 
-        if self.mode == "start_waiting":
+        if self.mode == "count_waiting":
             for (road_id, num_vehicles) in lane_waiting_vehicles_dict.items():
                 if road_id in self.start_lane_ids:
                     reward -= self.sec_per_step * num_vehicles
+        elif self.mode == "leader_speed":
+            lane_vehicles = self.cityflow.get_lane_vehicles()
+            lane_waiting_count = self.cityflow.get_lane_waiting_vehicle_count()
+            for keys, values in lane_vehicles.items():
+                if keys in self.start_lane_ids:
+
+                    if values:
+                        leader_speed = self.cityflow.get_vehicle_info(values[0])['speed']
+
+                    else:
+                        leader_speed = self.max_speed
 
         return reward
 
