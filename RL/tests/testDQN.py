@@ -10,7 +10,9 @@ from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
 
 import replay
 
+
 models_dir = "../models/"
+# enviroment config
 env_kwargs = {'config': "hangzhou_1x1_bc-tyc_18041608_1h", 'steps_per_episode': 121, 'steps_per_action': 30}
 
 
