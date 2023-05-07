@@ -18,18 +18,18 @@ def test():
 
     # iterate environment a little bit to test env
 
-    episodes = 1
-    for ep in range(episodes):
-        obs = env.reset()
-        rewards = []
-        done = False
-        while not done:
-            action = random.randint(0, actions - 1)
-            obs, reward, done, info = env.step(action)
-            rewards.append(reward)
-        print("Episode reward: ", sum(rewards))
-        print(info)
-    env.close()
+    # episodes = 1
+    # for ep in range(episodes):
+    #     obs = env.reset()
+    #     rewards = []
+    #     done = False
+    #     while not done:
+    #         action = random.randint(0, actions - 1)
+    #         obs, reward, done, info = env.step(action)
+    #         rewards.append(reward)
+    #     print("Episode reward: ", sum(rewards))
+    #     print(info)
+    # env.close()
 
     # replay.run(env_kwargs['config'])
 
