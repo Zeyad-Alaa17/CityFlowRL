@@ -34,7 +34,7 @@ def test(config=None):
     print("Episode reward: ", sum(rewards))
     print(info)
     env.close()
-    # replay.run(env_kwargs['config'])
+    replay.run(env_kwargs['config'])
     return info['avg_travel_time']
 
 

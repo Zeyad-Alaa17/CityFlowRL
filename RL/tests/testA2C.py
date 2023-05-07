@@ -7,6 +7,7 @@ from stable_baselines3 import A2C
 from stable_baselines3.common.callbacks import CheckpointCallback
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
+import replay
 
 models_dir = "../models/"
 env_kwargs = {'config': "hangzhou_1x1_bc-tyc_18041608_1h", 'steps_per_episode': 121, 'steps_per_action': 30}
@@ -42,6 +43,7 @@ def test(config=None):
         print("Episode reward: ", sum(rewards))
         print(info)
     env.close()
+    replay.run(env_kwargs['config'])
     return info[0]['avg_travel_time']
 
 
