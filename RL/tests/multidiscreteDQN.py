@@ -10,6 +10,63 @@ import CityFlowRL
 import os
 from gym.spaces import MultiDiscrete
 
+models_dir = "../models/"
+env_kwargs = {'config': "hangzhou_1x1_bc-tyc_18041608_1h", 'steps_per_episode': 121, 'steps_per_action': 30}  # ep = 3630
+env = gym.make('CityFlowRL-v0', **env_kwargs)
+
+
+def train():
+    env.set_save_replay(False)
+    obs = env.observation_space
+    action = env.action_space
+    model = MultiDiscreteDQN(obs, action)
+    total_episodes = 300
+    model.create_model()
+    # model.load(os.path.join(models_dir, "multi-hang-bc-608-3.3M-lr0.000000001-ed0.7-drop0.1"))
+    for episode in range(1, total_episodes + 1):
+        is_done = False
+        score = 0
+        state = env.reset()
+        total_reward = 0
+        while is_done == False:
+            action = model.act(state)
+            next_state, reward, is_done, info = env.step(action)
+            model.remember(state, action, reward, next_state, is_done)
+            model.learn()
+            state = next_state
+            total_reward += reward
+
+        model.epsilon = max(model.epsilon_min, model.epsilon * model.epsilon_decay)
+        print(f"Episode {episode + 1}: Total reward = {total_reward}: avg-travel-time = {info}")
+
+    model.save(os.path.join(models_dir, "multi-hang-608-new32"))
+    print("model saved")
+
+
+def test():
+    env.set_save_replay(True)
+    obs = env.observation_space
+    action = env.action_space
+    model = MultiDiscreteDQN(obs, action)
+    model.load(os.path.join(models_dir, "multi-hang-608-new32"))
+    num_test_episodes = 5
+    for episode in range(num_test_episodes):
+        state = env.reset()
+        is_done = False
+        total_reward = 0
+        while is_done == False:
+            # Choose the action with the highest Q-value
+            action = model.act(state)
+            # Take the action and observe the next state and reward
+            next_state, reward, is_done, info = env.step(action)
+
+            # Update the current state
+            state = next_state
+            total_reward += reward
+
+        # Print the total reward earned in the episode
+        print(f"Episode {episode + 1}: Total reward = {total_reward}: avg-travel-time = {info}")
+
 
 class MultiDiscreteDQN:
     def __init__(self, state_space, action_space, learning_rate=0.00001, gamma=0.99, epsilon=1.0, epsilon_min=0.01,
@@ -40,9 +97,11 @@ class MultiDiscreteDQN:
                 actions = 0
                 while env.action_space.contains(actions):
                     actions += 1
-                self.fc1 = nn.Linear(int(np.prod(input_shape)), 64)
-                self.fc2 = nn.Linear(64, 32)
-                self.fc3 = nn.Linear(32, actions)
+                self.fc1 = nn.Linear(int(np.prod(input_shape)), 32)     ##64 ,6432 ,32
+                self.fc2 = nn.Linear(32, 16)
+                self.fc3 = nn.Linear(16, actions)
+                # self.fc4 = nn.Linear(64, 32)
+                # self.fc5 = nn.Linear(32, actions)
                 self.dropout = nn.Dropout(p=0.2)
 
             def forward(self, x):
@@ -52,6 +111,7 @@ class MultiDiscreteDQN:
                 x = torch.relu(self.fc2(x))
                 x = self.dropout(x)
                 x = self.fc3(x)
+                # x = torch.softmax(self.fc3(x), dim=-1)
                 if len(x) == 0:
                     return torch.empty((x.size(0),) + (5, 1), device=x.device)
                 else:
@@ -98,7 +158,7 @@ class MultiDiscreteDQN:
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
 
-        if self.steps % 50 == 0:
+        if self.steps % 20 == 0:
             self.target_net.load_state_dict(self.policy_net.state_dict())
 
     def save(self, path):
@@ -118,51 +178,4 @@ class MultiDiscreteDQN:
 
 
 if __name__ == "__main__":
-    models_dir = "../models/"
-    env_kwargs = {'config': "1x1_config", 'steps_per_episode': 100, 'steps_per_action': 30}
-    env = gym.make('CityFlowRL-v0', **env_kwargs)
-    env.set_save_replay(False)
-    obs = env.observation_space
-    action = env.action_space
-    model = MultiDiscreteDQN(obs, action)
-    total_episodes = 500
-    model.create_model()
-    # model.load(os.path.join(models_dir, "multi-hang"))
-    for episode in range(1, total_episodes + 1):
-        is_done = False
-        score = 0
-        state = env.reset()
-        total_reward = 0
-        while is_done == False:
-            action = model.act(state)
-            next_state, reward, is_done, info = env.step(action)
-            model.remember(state, action, reward, next_state, is_done)
-            model.learn()
-            state = next_state
-            total_reward += reward
-
-        model.epsilon = max(model.epsilon_min, model.epsilon * model.epsilon_decay)
-        print(f"Episode {episode + 1}: Total reward = {total_reward}: avg-travel-time = {info}")
-
-    model.save(os.path.join(models_dir, "multi-1.5M"))
-    print("model saved")
-
-    # Test the DQN for 10 episodes
-    env.set_save_replay(True)
-    num_test_episodes = 5
-    for episode in range(num_test_episodes):
-        state = env.reset()
-        is_done = False
-        total_reward = 0
-        while is_done == False:
-            # Choose the action with the highest Q-value
-            action = model.act(state)
-            # Take the action and observe the next state and reward
-            next_state, reward, is_done, info = env.step(action)
-
-            # Update the current state
-            state = next_state
-            total_reward += reward
-
-        # Print the total reward earned in the episode
-        print(f"Episode {episode + 1}: Total reward = {total_reward}: avg-travel-time = {info}")
+    train()
