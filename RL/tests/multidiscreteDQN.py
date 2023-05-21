@@ -11,8 +11,6 @@ import CityFlowRL
 import os
 from gym.spaces import MultiDiscrete
 
-
-
 models_dir = "../models/"
 env_kwargs = {'config': "hangzhou_1x1_bc-tyc_18041608_1h", 'steps_per_episode': 121,
               'steps_per_action': 30}  # ep = 3630
@@ -48,9 +46,9 @@ class MultiDiscreteDQN:
                 actions = 0
                 while env.action_space.contains(actions):
                     actions += 1
-                self.fc1 = nn.Linear(int(np.prod(input_shape)), 32)  ##64 ,6432 ,32
-                self.fc2 = nn.Linear(32, 16)
-                self.fc3 = nn.Linear(16, actions)
+                self.fc1 = nn.Linear(int(np.prod(input_shape)), 64)  ##64 ,6432 ,32
+                self.fc2 = nn.Linear(64, 32)
+                self.fc3 = nn.Linear(32, actions)
                 # self.fc4 = nn.Linear(64, 32)
                 # self.fc5 = nn.Linear(32, actions)
                 self.dropout = nn.Dropout(p=0.2)
@@ -121,7 +119,7 @@ class MultiDiscreteDQN:
         }, path)
 
     def load(self, path):
-        checkpoint = torch.load(path)
+        checkpoint = torch.load(path, map_location=self.device)
         self.policy_net.load_state_dict(checkpoint['policy_state_dict'])
         self.target_net.load_state_dict(checkpoint['target_state_dict'])
         self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
@@ -149,9 +147,9 @@ def train():
             model.learn()
             state = next_state
             total_reward += reward
-        writer.add_scalar('reward', total_reward, episode*3600)
+        writer.add_scalar('reward', total_reward, episode * 3600)
         model.epsilon = max(model.epsilon_min, model.epsilon * model.epsilon_decay)
-        print(f"Episode {episode }: Total reward = {total_reward}: avg-travel-time = {info}")
+        print(f"Episode {episode}: Total reward = {total_reward}: avg-travel-time = {info}")
 
     model.save(os.path.join(models_dir, "multi-hang-608-new32"))
     print("model saved")
@@ -159,11 +157,12 @@ def train():
 
 def test():
     env.set_save_replay(True)
+    env.set_replay_path('dqnReplay.txt')
     obs = env.observation_space
     action = env.action_space
     model = MultiDiscreteDQN(obs, action)
-    model.load(os.path.join(models_dir, "multi-hang-608-new32"))
-    num_test_episodes = 5
+    model.load(os.path.join(models_dir, "multi-hang-bc-608-3.3M-lr0.00000001-ed0.1"))
+    num_test_episodes = 1
     for episode in range(num_test_episodes):
         state = env.reset()
         is_done = False
@@ -183,4 +182,4 @@ def test():
 
 
 if __name__ == "__main__":
-    train()
+    test()

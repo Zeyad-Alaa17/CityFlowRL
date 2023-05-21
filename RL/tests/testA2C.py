@@ -26,6 +26,8 @@ def test(config=None):
         env_kwargs['config'] = config
 
     env = gym.make('CityFlowRL-v0', **env_kwargs)
+    env.set_replay_path('a2cReplay.txt')
+
 
     env = DummyVecEnv([lambda: env])
 
@@ -43,7 +45,7 @@ def test(config=None):
         print("Episode reward: ", sum(rewards))
         print(info)
     env.close()
-    replay.run(env_kwargs['config'])
+    # replay.run(env_kwargs['config'])
     return info[0]['avg_travel_time']
 
 

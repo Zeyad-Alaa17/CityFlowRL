@@ -7,6 +7,7 @@ import replay
 
 env_kwargs = {'config': "hangzhou_1x1_bc-tyc_18041608_1h", 'steps_per_episode': 121, 'steps_per_action': 30}
 env = gym.make('CityFlowRL-v0', **env_kwargs)
+env.set_replay_path('staticReplay.txt')
 
 
 def test(config=None):
@@ -34,7 +35,7 @@ def test(config=None):
     print("Episode reward: ", sum(rewards))
     print(info)
     env.close()
-    replay.run(env_kwargs['config'])
+    # replay.run(env_kwargs['config'])
     return info['avg_travel_time']
 
 

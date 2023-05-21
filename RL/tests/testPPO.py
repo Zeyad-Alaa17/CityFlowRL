@@ -9,7 +9,7 @@ from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
 
 models_dir = "../models/"
-env_kwargs = {'config': "hangzhou_1x1_sb-sx_18041608_1h", 'steps_per_episode': 121, 'steps_per_action': 30}
+env_kwargs = {'config': "hangzhou_1x1_bc-tyc_18041608_1h", 'steps_per_episode': 121, 'steps_per_action': 30}
 
 
 def train():
@@ -25,6 +25,7 @@ def test(config=None):
         env_kwargs['config'] = config
 
     env = gym.make('CityFlowRL-v0', **env_kwargs)
+    env.set_replay_path('ppoReplay2.txt')
 
     env = DummyVecEnv([lambda: env])
 
